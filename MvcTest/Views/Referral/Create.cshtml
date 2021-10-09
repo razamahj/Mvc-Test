@@ -1,0 +1,58 @@
+﻿@model MvcTest.Models.ReferralModel;
+
+@{
+    ViewData["Title"] = "Create Referral";
+    List<SelectListItem> services = new List<SelectListItem>
+        {
+        new SelectListItem { Value = "Service One", Text = "Service One" },
+        new SelectListItem { Value = "Service Two", Text = "Service Two" },
+
+    };
+}
+<h1>Create Referral</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @if (ViewData["Under18"].ToString().ToLower() == "true")
+        { 
+            <b>Client is under the age of 18 </b>
+        } 
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Forename" class="control-label"></label>
+                <input asp-for="Forename" class="form-control" />
+                <span asp-validation-for="Forename" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surname" class="control-label"></label>
+                <input asp-for="Surname" class="form-control" />
+                <span asp-validation-for="Surname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateOfBirth" class="control-label"></label>
+                <input asp-for="DateOfBirth" class="form-control" />
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactTelephoneNumber" class="control-label"></label>
+                <input asp-for="ContactTelephoneNumber" class="form-control" />
+                <span asp-validation-for="ContactTelephoneNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmailAddress" class="control-label"></label>
+                <input asp-for="EmailAddress" class="form-control" />
+                <span asp-validation-for="EmailAddress" class="text-danger"></span>
+            </div>
+            <select asp-for="ServiceName" asp-items="services"></select>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
