@@ -24,31 +24,33 @@ namespace MvcTest.Controllers
 
         }
 
-        public IActionResult List()
+        public IActionResult List(string searchItem = "")
         {
             var referralList = new List<ReferralModel>();
             foreach (var item in dbContext.Referrals.OrderByDescending(r => r.DateOfReferral))
             {
                 item.Client = dbContext.Clients.First(c => c.Id == item.ClientId);
-                item.Service = dbContext.Services.First(c => c.Id == item.ServiceId);
-                var objReferral = new ReferralModel()
+                if (string.IsNullOrEmpty(searchItem) || item.Client.Forename.ToLower() == searchItem.ToLower() || item.Client.Surname.ToLower() == searchItem.ToLower()) 
                 {
-                    Forename = item.Client.Forename,
-                    Surname = item.Client.Surname,
-                    EmailAddress = item.Client.EmailAddress,
-                    ContactTelephoneNumber = item.Client.ContactTelephoneNumber,
-                    ServiceName = item.Service.Name,
-                    DOR = item.DateOfReferral.Date,
-                    DateOfBirth = item.Client.DateOfBirth.Value,
-                };
-                referralList.Add(objReferral);
+                    item.Service = dbContext.Services.First(c => c.Id == item.ServiceId);
+                    var objReferral = new ReferralModel()
+                    {
+                        Forename = item.Client.Forename,
+                        Surname = item.Client.Surname,
+                        EmailAddress = item.Client.EmailAddress,
+                        ContactTelephoneNumber = item.Client.ContactTelephoneNumber,
+                        ServiceName = item.Service.Name,
+                        DOR = item.DateOfReferral.Date,
+                        DateOfBirth = item.Client.DateOfBirth.Value,
+                    };
+                    referralList.Add(objReferral);
+                }
             }
             return View(referralList);
         }
 
         public IActionResult Create()
         {
-            ViewData["Under18"] = false;
             ViewData["ValidationError"] = "";
             return View();
         }
