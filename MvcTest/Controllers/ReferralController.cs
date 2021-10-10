@@ -21,13 +21,13 @@ namespace MvcTest.Controllers
         {
             _logger = logger;
             this.dbContext = _dbContext;
-          
+
         }
 
         public IActionResult List()
         {
             var referralList = new List<ReferralModel>();
-            foreach(var item in dbContext.Referrals.OrderByDescending(r => r.DateOfReferral))
+            foreach (var item in dbContext.Referrals.OrderByDescending(r => r.DateOfReferral))
             {
                 item.Client = dbContext.Clients.First(c => c.Id == item.ClientId);
                 item.Service = dbContext.Services.First(c => c.Id == item.ServiceId);
@@ -56,38 +56,40 @@ namespace MvcTest.Controllers
         [HttpPost]
         public IActionResult Create(ReferralModel referral)
         {
-            var objClient = new Client();
-            var objService = new Service();
-            var objReferral = new Referral();
-
-            objClient.Forename = referral.Forename;
-            objClient.DateOfBirth = referral.DateOfBirth;
-            objClient.Surname = referral.Surname;
-            objClient.EmailAddress = referral.EmailAddress;
-            objClient.ContactTelephoneNumber = referral.ContactTelephoneNumber;
-       
-           // objReferral.Service = referral.Service;
-            objReferral.Client = objClient;
-       
-            dbContext.Clients.Add(objClient);
-            //dbContext.SaveChanges();
-
-            objService = dbContext.Services.First(s => s.Name == referral.ServiceName);
-            objReferral.Client = objClient;
-            objReferral.Service = objService;
-
 
             if (referral.DateOfBirth > DateTime.Now.AddYears(-18))
             {
                 ViewData["ValidationError"] = "Client is under the age of 18";
                 return View(referral);
             }
-     
-            if(string.IsNullOrWhiteSpace(referral.EmailAddress) && string.IsNullOrWhiteSpace(referral.ContactTelephoneNumber))
+
+            if (string.IsNullOrWhiteSpace(referral.EmailAddress) && string.IsNullOrWhiteSpace(referral.ContactTelephoneNumber))
             {
                 ViewData["ValidationError"] = "Need either Email or Telephone";
                 return View(referral);
             }
+
+            var objClient = dbContext.Clients.FirstOrDefault(c => c.Forename.ToLower() == referral.Forename.ToLower() &&
+                                                            c.Surname.ToLower() == referral.Surname.ToLower() &&
+                                                            c.DateOfBirth == referral.DateOfBirth);
+            if (objClient == null)
+            {
+                objClient = new Client();
+                objClient.Forename = referral.Forename;
+                objClient.DateOfBirth = referral.DateOfBirth;
+                objClient.Surname = referral.Surname;
+                objClient.EmailAddress = referral.EmailAddress;
+                objClient.ContactTelephoneNumber = referral.ContactTelephoneNumber;
+                dbContext.Clients.Add(objClient);
+            }
+
+            var objReferral = new Referral();
+
+            objReferral.Client = objClient;
+
+            var objService = dbContext.Services.First(s => s.Name == referral.ServiceName);
+            objReferral.Client = objClient;
+            objReferral.Service = objService;
 
             objReferral.DateOfReferral = DateTime.Now;
             dbContext.Referrals.Add(objReferral);
