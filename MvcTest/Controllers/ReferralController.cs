@@ -58,16 +58,9 @@ namespace MvcTest.Controllers
         [HttpPost]
         public IActionResult Create(ReferralModel referral)
         {
-
-            if (referral.DateOfBirth > DateTime.Now.AddYears(-18))
+            if (!isDataValid(referral, out string errorMessage))
             {
-                ViewData["ValidationError"] = "Client is under the age of 18";
-                return View(referral);
-            }
-
-            if (string.IsNullOrWhiteSpace(referral.EmailAddress) && string.IsNullOrWhiteSpace(referral.ContactTelephoneNumber))
-            {
-                ViewData["ValidationError"] = "Need either Email or Telephone";
+                ViewData["ValidationError"] =  errorMessage;
                 return View(referral);
             }
 
@@ -98,6 +91,22 @@ namespace MvcTest.Controllers
             dbContext.SaveChanges();
 
             return View("ReferralAdded");
+        }
+
+        private bool isDataValid(ReferralModel referral, out string errorMessage)
+        {
+            errorMessage = "";
+            if (referral.DateOfBirth > DateTime.Now.AddYears(-18))
+            {
+                errorMessage = "Client is under the age of 18";
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(referral.EmailAddress) && string.IsNullOrWhiteSpace(referral.ContactTelephoneNumber))
+            {
+               errorMessage = "Need either Email or Telephone";
+               return false;
+            }
+            return true;
         }
     }
 }
