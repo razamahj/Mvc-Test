@@ -38,7 +38,7 @@ namespace MvcTest.Controllers
                     EmailAddress = item.Client.EmailAddress,
                     ContactTelephoneNumber = item.Client.ContactTelephoneNumber,
                     ServiceName = item.Service.Name,
-                    DOR = item.DateOfReferral,
+                    DOR = item.DateOfReferral.Date,
                     DateOfBirth = item.Client.DateOfBirth.Value,
                 };
                 referralList.Add(objReferral);
