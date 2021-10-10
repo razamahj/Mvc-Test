@@ -15,21 +15,11 @@ namespace MvcTest.Models
 
         public DateTime DOR { get; set; }
 
-
         public string EmailAddress { get; set; }
 
         [Required(ErrorMessage = "Telephone is required.")]
         public string ContactTelephoneNumber { get; set; }
 
         public string ServiceName { get; set; }
-
-        public List<SelectListItem> Services { get; } = new List<SelectListItem>
-        {
-        new SelectListItem { Value = "Service One", Text = "Service One" },
-        new SelectListItem { Value = "Service Two", Text = "Service Two" },
-
-    };
-
-        // public Service Service { get; set; }
     }
 }

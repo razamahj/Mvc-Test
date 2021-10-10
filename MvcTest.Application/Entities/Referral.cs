@@ -11,7 +11,7 @@ namespace MvcTest.Application.Entities
         public Guid Id { get; set; }
         public DateTime DateOfReferral { get; set; }
         public Service Service { get; set; }
-
+        public Guid ServiceId { get; set; }
         public Guid ClientId { get; set; }
         public Client Client { get; set; }
     }

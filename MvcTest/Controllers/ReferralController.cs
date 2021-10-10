@@ -24,9 +24,26 @@ namespace MvcTest.Controllers
           
         }
 
-        public IActionResult GetReferrals()
+        public IActionResult List()
         {
-            return View();
+            var referralList = new List<ReferralModel>();
+            foreach(var item in dbContext.Referrals)
+            {
+                item.Client = dbContext.Clients.First(c => c.Id == item.ClientId);
+                item.Service = dbContext.Services.First(c => c.Id == item.ServiceId);
+                var objReferral = new ReferralModel()
+                {
+                    Forename = item.Client.Forename,
+                    Surname = item.Client.Surname,
+                    EmailAddress = item.Client.EmailAddress,
+                    ContactTelephoneNumber = item.Client.ContactTelephoneNumber,
+                    ServiceName = item.Service.Name,
+                    DOR = item.DateOfReferral,
+                    DateOfBirth = item.Client.DateOfBirth.Value,
+                };
+                referralList.Add(objReferral);
+            }
+            return View(referralList);
         }
 
         public IActionResult Create()
