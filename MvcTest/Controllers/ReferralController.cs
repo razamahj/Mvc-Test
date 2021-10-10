@@ -27,7 +27,7 @@ namespace MvcTest.Controllers
         public IActionResult List()
         {
             var referralList = new List<ReferralModel>();
-            foreach(var item in dbContext.Referrals)
+            foreach(var item in dbContext.Referrals.OrderByDescending(r => r.DateOfReferral))
             {
                 item.Client = dbContext.Clients.First(c => c.Id == item.ClientId);
                 item.Service = dbContext.Services.First(c => c.Id == item.ServiceId);
@@ -49,6 +49,7 @@ namespace MvcTest.Controllers
         public IActionResult Create()
         {
             ViewData["Under18"] = false;
+            ViewData["ValidationError"] = "";
             return View();
         }
 
@@ -78,14 +79,16 @@ namespace MvcTest.Controllers
 
             if (referral.DateOfBirth > DateTime.Now.AddYears(-18))
             {
-                ViewData["Under18"] = true;
-                return View();
+                ViewData["ValidationError"] = "Client is under the age of 18";
+                return View(referral);
             }
-            else
+     
+            if(string.IsNullOrWhiteSpace(referral.EmailAddress) && string.IsNullOrWhiteSpace(referral.ContactTelephoneNumber))
             {
-                ViewData["Under18"] = false;
+                ViewData["ValidationError"] = "Need either Email or Telephone";
+                return View(referral);
             }
-            
+
             objReferral.DateOfReferral = DateTime.Now;
             dbContext.Referrals.Add(objReferral);
             dbContext.SaveChanges();
