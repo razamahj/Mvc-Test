@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using MimeKit;
 using MvcTest.Application.Entities;
 using MvcTest.Application.Persistence;
 using MvcTest.Models;
@@ -59,15 +62,45 @@ namespace MvcTest.DataHelper
             objReferral.DateOfReferral = DateTime.Now;
             dbContext.Referrals.Add(objReferral);
             dbContext.SaveChanges();
-
-            NotifyManager(referral);
-
+   
             return true;
-        }
-
-        private void NotifyManager(ReferralModel referral)
+            }
+        
+        public void NotifyManager(ReferralModel referral)
         {
-            //To be implemented later
+
+            var managerEmail = (from s in dbContext.Services
+                             join u in dbContext.Users on s.ManagerId equals u.Id
+                             where s.Name == referral.ServiceName
+                             select u).FirstOrDefault();
+
+            string emailPath = @"C:\Emails";
+            if (!Directory.Exists(emailPath))
+            {
+                Directory.CreateDirectory(emailPath);
+            }
+
+            var client = new SmtpClient
+            {
+                DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
+                PickupDirectoryLocation = emailPath
+            };
+
+            MailAddress from = new MailAddress("junaid2396@hotmail.com",
+            "Junaid " + (char)0xD8 + " Mahmood",
+            System.Text.Encoding.UTF8);
+            // Set destinations for the email message.
+            MailAddress to = new MailAddress(managerEmail.EmailAddress);
+            // Specify the message content.
+            MailMessage message = new MailMessage(from, to);
+            message.Body = "This is a test email message sent by an application. ";
+            // Include some non-ASCII characters in body and subject.
+            message.Body += Environment.NewLine;
+            message.BodyEncoding = System.Text.Encoding.UTF8;
+            message.Subject = "New Referral";
+            message.SubjectEncoding = System.Text.Encoding.UTF8;
+
+            client.Send(message);
         }
 
         public List<ReferralModel> GetReferrals(string searchItem)
@@ -93,7 +126,6 @@ namespace MvcTest.DataHelper
                     referralList.Add(objReferral);
                 }
             }
-
             return referralList;
         }
     }

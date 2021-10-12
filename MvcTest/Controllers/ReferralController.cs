@@ -35,7 +35,6 @@ namespace MvcTest.Controllers
             ViewData["ValidationError"] = "";
             return View();
         }
-
         [HttpPost]
         public IActionResult Create(ReferralModel referral)
         {
@@ -45,7 +44,10 @@ namespace MvcTest.Controllers
                 return View(referral);
             }
 
-            referralHelper.CreateReferral(referral);
+            if (referralHelper.CreateReferral(referral) == true)
+            {
+                referralHelper.NotifyManager(referral);
+            }   
 
             return View("ReferralAdded");
         }
